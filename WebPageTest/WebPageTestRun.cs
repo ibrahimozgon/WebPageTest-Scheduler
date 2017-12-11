@@ -26,20 +26,33 @@ namespace WebPageTest
         [Test]
         public void Run()
         {
-            var pages = ConfigurationManager.AppSettings.Get("urls").Split(';');
-            var results = pages.Select(TestPage).ToList();
+            var results = new List<PerformanceTestResult>();
+            results.AddRange(RunPagesTests("urls", false));
+            results.AddRange(RunPagesTests("mobileUrls", true));
 
             SendMail(results);
         }
 
-        private PerformanceTestResult TestPage(string url)
+        private IEnumerable<PerformanceTestResult> RunPagesTests(string key, bool isMobile)
+        {
+            var urlStr = ConfigurationManager.AppSettings.Get(key);
+            if (!string.IsNullOrEmpty(urlStr))
+            {
+                return urlStr.Split(';')
+                    .Where(s => !string.IsNullOrEmpty(s))
+                    .Select(s => TestPage(s, isMobile)).ToList();
+            }
+            return new List<PerformanceTestResult>();
+        }
+
+        private PerformanceTestResult TestPage(string url, bool isMobile)
         {
             try
             {
                 var commands = new Commands(WebpageTestUrl);
                 _log.WarnFormat("Browser acildi");
                 commands.GoTo(WebpageTestUrl);
-                FillPageForm(commands, url);
+                FillPageForm(commands, url, isMobile);
                 var result = GetTestResult(commands);
                 result.TestedPageUrl = url;
                 result.Date = DateTime.Now.ToString(CultureInfo.InvariantCulture);
@@ -53,15 +66,26 @@ namespace WebPageTest
             }
         }
 
-        private static void FillPageForm(Commands commands, string url)
+        private static void FillPageForm(Commands commands, string url, bool isMobile)
         {
             const string urlInput = "//input[@name='url']";
             commands.SendKeys(LocatorType.XPath, urlInput, url);
             commands.Click(LocatorType.Id, "advanced_settings");
-            commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value,
-                "Dulles:Chrome.DSL");
+
+            if (isMobile)
+            {
+                commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Mobile_Dulles_Nexus5");
+                commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value,
+                    "Dulles_Nexus5:Nexus 5 - Chrome.3G");
+            }
+            else
+            {
+                commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Istanbul_loc");
+                commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value,
+                    "Istanbul:Chrome.DSL");
+            }
+
             commands.SendKeys(LocatorType.Id, "number_of_tests", "1");
-            commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Istanbul_loc");
             commands.Click(LocatorType.ClassName, "start_test");
         }
 
@@ -69,6 +93,9 @@ namespace WebPageTest
         {
             commands.WaitForVisible(LocatorType.XPath, "//div[@id='optimization']", TimeSpan.FromMinutes(10));
             var firstViewTime = commands.GetText(LocatorType.XPath, "//td[@id='LoadTime']");
+            var from = commands.GetText(LocatorType.ClassName, "heading_details");
+            if (!string.IsNullOrEmpty(from))
+                from = from.Replace("From: ", "");
             var url = commands.GetDriverUrl();
             var screenshotPath = commands.TakeScreenshotAndGetPath();
             return new PerformanceTestResult
@@ -76,6 +103,7 @@ namespace WebPageTest
                 ResultUrl = url,
                 FirstViewTime = firstViewTime,
                 ScreenshotPath = screenshotPath,
+                From = from,
             };
         }
 
@@ -99,9 +127,10 @@ namespace WebPageTest
                 mail.Attachments.Add(screenshotAttachment);
 
                 mail.Body += $"Test edilen Sayfa: <a href=\"{result.TestedPageUrl}\">{result.TestedPageUrl}</a>" +
-                            $"<br>Sonuş sayfası: <a href=\"{result.ResultUrl}\">{result.ResultUrl}</a>" +
-                            $"<br>Saat: {result.Date}" +
-                            $"<br>Süre: {result.FirstViewTime}<br><hr><br>";
+                             $"<br>Lokasyon:{result.From}" +
+                             $"<br>Sonuş sayfası: <a href=\"{result.ResultUrl}\">{result.ResultUrl}</a>" +
+                             $"<br>Saat: {result.Date}" +
+                             $"<br>Süre: {result.FirstViewTime}<br><hr><br>";
             }
 
             smtpServer.Port = int.Parse(ConfigurationManager.AppSettings["mail.port"]);
@@ -111,7 +140,5 @@ namespace WebPageTest
 
             smtpServer.Send(mail);
         }
-
-
     }
 }

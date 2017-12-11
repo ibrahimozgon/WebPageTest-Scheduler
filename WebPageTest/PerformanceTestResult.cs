@@ -7,5 +7,6 @@
         public string FirstViewTime { get; set; }
         public string ScreenshotPath { get; set; }
         public string Date { get; set; }
+        public string From { get; set; }
     }
 }
