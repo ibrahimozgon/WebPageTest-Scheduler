@@ -71,21 +71,25 @@ namespace WebPageTest
             const string urlInput = "//input[@name='url']";
             commands.SendKeys(LocatorType.XPath, urlInput, url);
             commands.Click(LocatorType.Id, "advanced_settings");
-
+            commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Istanbul_loc");
+            commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value, "Istanbul:Chrome.Cable");
+            commands.SendKeys(LocatorType.Id, "number_of_tests", "1");
             if (isMobile)
             {
-                commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Mobile_Dulles_Nexus5");
-                commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value,
-                    "Dulles_Nexus5:Nexus 5 - Chrome.3G");
+                var chromeTabXPath = "//div[@id='test_subbox-container']//ul//li[3]";
+                commands.WaitForVisible(LocatorType.XPath, chromeTabXPath);
+                commands.Click(LocatorType.XPath, chromeTabXPath);
+                commands.Click(LocatorType.Id, "mobile");
+                commands.SelectDropDownElement(By.Name("mobileDevice"), DropdownSelector.Value, "GalaxyS7");
             }
-            else
+            var blockedDomains = ConfigurationManager.AppSettings["blockedDomains"];
+            if (!string.IsNullOrEmpty(blockedDomains))
             {
-                commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Istanbul_loc");
-                commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value,
-                    "Istanbul:Chrome.DSL");
+                const string blockXPath = "//div[@id='test_subbox-container']//ul//li[6]";
+                commands.Click(LocatorType.XPath, blockXPath);
+                commands.SendKeys(LocatorType.Id, "block_requests_containing", blockedDomains);
             }
 
-            commands.SendKeys(LocatorType.Id, "number_of_tests", "1");
             commands.Click(LocatorType.ClassName, "start_test");
         }
 
