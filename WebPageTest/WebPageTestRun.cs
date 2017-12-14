@@ -15,6 +15,7 @@ namespace WebPageTest
     {
         private ILog _log;
         private const string WebpageTestUrl = "https://www.webpagetest.org/";
+
         [SetUp]
         public void SetUp()
         {
@@ -23,13 +24,18 @@ namespace WebPageTest
             _log.WarnFormat("Selenium Basladi");
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _log.WarnFormat("Selenium Sonlandi");
+        }
+
         [Test]
         public void Run()
         {
             var results = new List<PerformanceTestResult>();
             results.AddRange(RunPagesTests("urls", false));
             results.AddRange(RunPagesTests("mobileUrls", true));
-
             SendMail(results);
         }
 
@@ -50,18 +56,19 @@ namespace WebPageTest
             try
             {
                 var commands = new Commands(WebpageTestUrl);
-                _log.WarnFormat("Browser acildi");
                 commands.GoTo(WebpageTestUrl);
+                _log.WarnFormat("Browser acildi.  Url: {0}  -  IsMobile: {1}", url, isMobile);
                 FillPageForm(commands, url, isMobile);
                 var result = GetTestResult(commands);
                 result.TestedPageUrl = url;
                 result.Date = DateTime.Now.ToString(CultureInfo.InvariantCulture);
                 commands.Dispose();
+                _log.WarnFormat("Browser kapatildi.");
                 return result;
             }
             catch (Exception e)
             {
-                _log.Error(e);
+                _log.ErrorFormat("Test sirasinda hata alindi. Url: {0}  -  IsMobile: {1}  -  Hata: {2}", url, isMobile, e);
                 return null;
             }
         }
