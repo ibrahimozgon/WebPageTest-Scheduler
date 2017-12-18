@@ -21,8 +21,11 @@ Testi çalıştırmak için herhangi bir kod değişikliğine gerek yoktur. [aop
 ```
 
 **mail. ile baslayan anahtarlar** mail gönderim ayarları içindir.
+
 **blockedDomains** test sırasında bloklanmak istenen domainler içindir.
+
 **urls** web ortamında test edilecek url listesi arada noktalı virgül ile ayrılarak verilmelidir.
+
 **mobileUrls** mobil ortamında test edilecek url listesi arada noktalı virgül ile ayrılarak verilmelidir.
 
 
