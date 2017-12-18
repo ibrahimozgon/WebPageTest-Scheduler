@@ -4,7 +4,7 @@ https://www.webpagetest.org/ üzerinde verilen url leri test edip sonucunu mail 
 Config dosyasında verilen url leri ard arda test eder. Test sonucu sayfa yüklenme süresini alır, ekran görüntüsü kaydeder. 
 Tüm bunları e-posta ile gönderir.
 
-###Kullanım
+### Kullanım
 Testi çalıştırmak için herhangi bir kod değişikliğine gerek yoktur. [aop.config](https://github.com/ibrahimozgon/WebPageSpeedTest/blob/master/WebPageTest/app.config) dosyasını isteğe göre düzenlemek yeterli olacaktır.
 ```
 <appSettings>
