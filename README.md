@@ -5,7 +5,7 @@ Config dosyasında verilen url leri ard arda test eder. Test sonucu sayfa yükle
 Tüm bunları e-posta ile gönderir.
 
 ### Kullanım
-Testi çalıştırmak için herhangi bir kod değişikliğine gerek yoktur. [aop.config](https://github.com/ibrahimozgon/WebPageSpeedTest/blob/master/WebPageTest/app.config) dosyasını isteğe göre düzenlemek yeterli olacaktır.
+Testi çalıştırmak için herhangi bir kod değişikliğine gerek yoktur. [app.config](https://github.com/ibrahimozgon/WebPageSpeedTest/blob/master/WebPageTest/app.config) dosyasını isteğe göre düzenlemek yeterli olacaktır.
 ```
 <appSettings>
 <add key="mail.smtp" value="smtp server address" />
