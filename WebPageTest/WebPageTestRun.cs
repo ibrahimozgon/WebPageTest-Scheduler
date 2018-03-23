@@ -63,7 +63,7 @@ namespace WebPageTest
                 var result = GetTestResult(commands);
                 result.TestedPageUrl = url;
                 result.Date = DateTime.Now.ToString(CultureInfo.InvariantCulture);
-               
+
                 _log.WarnFormat("Browser kapatildi.");
                 return result;
             }
@@ -81,11 +81,13 @@ namespace WebPageTest
 
         private static void FillPageForm(Commands commands, string url, bool isMobile)
         {
+            var whereValue = ConfigurationManager.AppSettings.Get("whereValue");
+            var locationValue = ConfigurationManager.AppSettings.Get("locationValue");
             const string urlInput = "//input[@name='url']";
             commands.SendKeys(LocatorType.XPath, urlInput, url);
             commands.Click(LocatorType.Id, "advanced_settings");
-            commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, "Istanbul_loc");
-            commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value, "Istanbul:Chrome.Cable");
+            commands.SelectDropDownElement(By.Name("where"), DropdownSelector.Value, whereValue);
+            commands.SelectDropDownElement(By.Name("location"), DropdownSelector.Value, locationValue);
             commands.SendKeys(LocatorType.Id, "number_of_tests", "1");
             if (isMobile)
             {
