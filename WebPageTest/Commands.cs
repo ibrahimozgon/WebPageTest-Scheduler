@@ -12,9 +12,9 @@ namespace WebPageTest
 {
     public class Commands : IDisposable
     {
-        private readonly IWebDriver _driver;
+        private IWebDriver _driver;
 
-        public Commands(string url)
+        public void OpenDriver(string url)
         {
             var options = new ChromeOptions();
             options.AddArgument("--start-maximized");
@@ -22,6 +22,7 @@ namespace WebPageTest
             _driver = driver;
             GoTo(url);
         }
+
         public void WaitForVisible(LocatorType by, string locator, TimeSpan? waitTime = null)
         {
             var wait = new WebDriverWait(_driver, waitTime ?? new TimeSpan(0, 0, 30));
@@ -182,6 +183,7 @@ namespace WebPageTest
 
         public void Dispose()
         {
+            _driver?.Close();
             _driver?.Quit();
             _driver?.Dispose();
         }

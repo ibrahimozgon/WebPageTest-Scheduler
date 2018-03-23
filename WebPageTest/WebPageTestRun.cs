@@ -53,23 +53,29 @@ namespace WebPageTest
 
         private PerformanceTestResult TestPage(string url, bool isMobile)
         {
+            var commands = new Commands();
             try
             {
-                var commands = new Commands(WebpageTestUrl);
+                commands.OpenDriver(WebpageTestUrl);
                 commands.GoTo(WebpageTestUrl);
                 _log.WarnFormat("Browser acildi.  Url: {0}  -  IsMobile: {1}", url, isMobile);
                 FillPageForm(commands, url, isMobile);
                 var result = GetTestResult(commands);
                 result.TestedPageUrl = url;
                 result.Date = DateTime.Now.ToString(CultureInfo.InvariantCulture);
-                commands.Dispose();
+               
                 _log.WarnFormat("Browser kapatildi.");
                 return result;
             }
             catch (Exception e)
             {
-                _log.ErrorFormat("Test sirasinda hata alindi. Url: {0}  -  IsMobile: {1}  -  Hata: {2}", url, isMobile, e);
+                _log.ErrorFormat("Test sirasinda hata alindi. Url: {0}  -  IsMobile: {1}  -  Hata: {2}", url, isMobile,
+                    e);
                 return null;
+            }
+            finally
+            {
+                commands.Dispose();
             }
         }
 
