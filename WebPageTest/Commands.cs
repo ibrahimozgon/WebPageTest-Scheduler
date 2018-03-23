@@ -183,9 +183,7 @@ namespace WebPageTest
 
         public void Dispose()
         {
-            _driver?.Close();
             _driver?.Quit();
-            _driver?.Dispose();
         }
 
         public Screenshot TakeScreenShot()
