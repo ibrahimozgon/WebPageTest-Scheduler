@@ -110,7 +110,12 @@ namespace WebPageTest
 
         private static PerformanceTestResult GetTestResult(Commands commands)
         {
-            commands.WaitForVisible(LocatorType.XPath, "//div[@id='optimization']", TimeSpan.FromMinutes(10));
+            var timeoutTimespan = TimeSpan.FromMinutes(10);
+            var timeout = ConfigurationManager.AppSettings["timeout"];
+            if (!string.IsNullOrEmpty(timeout))
+                timeoutTimespan = TimeSpan.FromMinutes(int.Parse(timeout));
+
+            commands.WaitForVisible(LocatorType.XPath, "//div[@id='optimization']", timeoutTimespan);
             var firstViewTime = commands.GetText(LocatorType.XPath, "//td[@id='LoadTime']");
             var from = commands.GetText(LocatorType.ClassName, "heading_details");
             if (!string.IsNullOrEmpty(from))
